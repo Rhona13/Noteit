@@ -6,6 +6,12 @@ ini_set('display_errors', 1);
 session_start();
 require_once 'config.php';
 
+// ✅ If already logged in, go straight to admin.php
+if (isset($_SESSION['user_id'])) {
+    header("Location: admin.php");
+    exit();
+}
+
 $message = '';
 $messageType = '';
 
