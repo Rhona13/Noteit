@@ -1,76 +1,78 @@
 <?php
 require_once 'config.php';
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 $user_id = 1; // Default user for now
 
 // Handle actions (Create, Update, Delete)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Add note
-    if (isset($_POST['action']) && $_POST['action'] === 'add') {
-        $title   = $_POST['title'] ?? '';
-        $content = $_POST['content'] ?? '';
-        if ($title && $content) {
-            $stmt = $conn->prepare(
-                "INSERT INTO notes (title, content, status, date_created, user_id) 
-                 VALUES (?, ?, 'active', NOW(), ?)"
-            );
-            $stmt->execute([$title, $content, $user_id]);
-        }
-    }
+    $action  = $_POST['action'] ?? '';
+    $id      = $_POST['id'] ?? '';
+    $title   = $_POST['title'] ?? '';
+    $content = $_POST['content'] ?? '';
 
-    // Edit note
-    if (isset($_POST['action']) && $_POST['action'] === 'edit') {
-        $id      = $_POST['id'] ?? '';
-        $title   = $_POST['title'] ?? '';
-        $content = $_POST['content'] ?? '';
+    switch ($action) {
+        case 'add':
+            if ($title && $content) {
+                $stmt = $conn->prepare(
+                    "INSERT INTO notes (title, content, status, date_created, user_id) 
+                     VALUES (?, ?, 'active', NOW(), ?)"
+                );
+                $stmt->execute([$title, $content, $user_id]);
+            }
+            break;
 
-        if ($id && $title && $content) {
-            $stmt = $conn->prepare(
-                "UPDATE notes 
-                 SET title = ?, content = ? 
-                 WHERE id = ? AND user_id = ?"
-            );
-            $stmt->execute([$title, $content, $id, $user_id]);
-        }
-    }
+        case 'edit':
+            if ($id && $title && $content) {
+                $stmt = $conn->prepare(
+                    "UPDATE notes SET title = ?, content = ? 
+                     WHERE id = ? AND user_id = ?"
+                );
+                $stmt->execute([$title, $content, $id, $user_id]);
+            }
+            break;
 
-    // Set as favorite
-    if (isset($_POST['action']) && $_POST['action'] === 'favorite') {
-        $id = $_POST['id'] ?? '';
-        if ($id) {
-            $stmt = $conn->prepare(
-                "UPDATE notes SET status = 'Favorite' 
-                 WHERE id = ? AND user_id = ?"
-            );
-            $stmt->execute([$id, $user_id]);
-        }
-    }
+        case 'favorite':
+            // ✅ Hindi na natin gagamitin "Favorite" kasi wala sa enum
+            // Pwede natin i-keep as "active" or gumawa ng separate column for favorite
+            // For now, we'll just leave it active.
+            if ($id) {
+                $stmt = $conn->prepare(
+                    "UPDATE notes SET status = 'active' 
+                     WHERE id = ? AND user_id = ?"
+                );
+                $stmt->execute([$id, $user_id]);
+            }
+            break;
 
-    // Archive
-    if (isset($_POST['action']) && $_POST['action'] === 'archive') {
-        $id = $_POST['id'] ?? '';
-        if ($id) {
-            $stmt = $conn->prepare(
-                "UPDATE notes SET status = 'Archived' 
-                 WHERE id = ? AND user_id = ?"
-            );
-            $stmt->execute([$id, $user_id]);
-        }
-    }
+        case 'archive':
+            if ($id) {
+                $stmt = $conn->prepare(
+                    "UPDATE notes SET status = 'archived' 
+                     WHERE id = ? AND user_id = ?"
+                );
+                $stmt->execute([$id, $user_id]);
+            }
+            break;
 
-    // Delete
-    if (isset($_POST['action']) && $_POST['action'] === 'delete') {
-        $id = $_POST['id'] ?? '';
-        if ($id) {
-            $stmt = $conn->prepare(
-                "DELETE FROM notes 
-                 WHERE id = ? AND user_id = ?"
-            );
-            $stmt->execute([$id, $user_id]);
-        }
+        case 'delete':
+            if ($id) {
+                $stmt = $conn->prepare(
+                    "UPDATE notes SET status = 'deleted' 
+                     WHERE id = ? AND user_id = ?"
+                );
+                $stmt->execute([$id, $user_id]);
+            }
+            break;
     }
 
     // Redirect to prevent form resubmission
-    header("Location: index.php" . (isset($_GET['filter']) ? "?filter=" . $_GET['filter'] : ""));
+    $redirectUrl = "index.php";
+    if (isset($_GET['filter'])) {
+        $redirectUrl .= "?filter=" . urlencode($_GET['filter']);
+    }
+    header("Location: $redirectUrl");
     exit;
 }
 
@@ -80,7 +82,7 @@ $section_title = "All Notes";
 $title_color   = "#222";
 
 if ($filter === 'favorite') {
-    $section_title = "★ Favorites";
+    $section_title = "★ Active Notes";
     $title_color   = "#06b399";
 } elseif ($filter === 'archived') {
     $section_title = "🗄️ Archives";
@@ -90,9 +92,9 @@ if ($filter === 'favorite') {
 // Fetch notes based on filter
 $sql = "SELECT * FROM notes WHERE user_id = ?";
 if ($filter === 'favorite') {
-    $sql .= " AND status = 'Favorite'";
+    $sql .= " AND status = 'active'";
 } elseif ($filter === 'archived') {
-    $sql .= " AND status = 'Archived'";
+    $sql .= " AND status = 'archived'";
 }
 $sql .= " ORDER BY date_created DESC";
 
