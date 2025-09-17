@@ -1,0 +1,423 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    display: flex;
+    height: 100vh;
+    width: 100%;
+}
+
+.container {
+    display: flex;
+    width: 100%;
+    position: relative;
+    height: 100vh;
+}
+
+
+.sidebar {
+    background-color: #00B388;
+    color: black;
+    width: 15.5%;
+    flex-direction: column;
+    font-weight: bold;
+    margin-bottom: 20px;
+    height: 100vh;
+}
+
+div ul li.active, div ul li:hover{
+    background-color: #259b86;
+}
+
+
+.logo {
+    font-size: 28px;
+    font-weight: bold;
+    letter-spacing: -2px;
+    font-weight: 900;
+    text-align: center;
+    padding-top: 17px;
+}
+
+.highlight {
+    color: white;
+    
+}
+
+.nav-list {
+    list-style-type: none;
+    padding-bottom: 260px;
+    padding-top: 40px;
+    
+}
+.nav-list a{
+    color: black;
+    text-decoration: none;
+}
+
+.nav-list li {
+    padding: 10px 0;
+    cursor: pointer;
+    padding-left: 50px;
+}
+
+
+.user-info {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    bottom: 20px;
+    padding-left: 20px;
+}
+
+.avatar {
+    width: 40px;
+    height: 40px;
+    background-color: #C4C4C4;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.welcome p {
+    margin: 0;
+    font-size: 14px;
+
+}
+
+/* Main Content styling */
+.main-content {
+    flex: 1;
+    padding: 20px;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+
+.header h1 {
+    font-size: 23px;
+    font-weight: bolder;
+    text-decoration: underline #00B388;
+    padding-top: 5px;
+    text-underline-offset: 10px;
+    
+}
+.header input{
+    margin-left: 600px;
+    width: 300px;
+    text-align: left;
+    padding-left: 20px;
+}
+
+.search {
+    padding: 5px;
+    border-radius: 20px;
+    border: 1px solid #ccc;
+    width: 200px;
+}
+
+.add-note {
+    padding: 5px 15px;
+    background-color: #FFFFFF;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+}
+
+/* Notes Container and Card Styling */
+.notes-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-top: 25px;
+}
+
+.note-card {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 20px;
+    background-color: #fff;
+    height: 165px;
+    width: 350px;
+}
+.note-card h2{
+    font-size: larger;
+}
+
+
+.note-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 50px;
+    color: #777;
+    font-size: 12px;
+}
+
+.yellow-dot {
+    width: 10px;
+    height: 10px;
+    background-color: #FFC107;
+    border-radius: 50%;
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 5% auto;
+    padding: 0;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 600px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.modal-header h2 {
+    margin: 0;
+    color: #333;
+}
+
+.close {
+    color: #aaa;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover {
+    color: #000;
+}
+
+.modal form {
+    padding: 20px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #333;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.btn-primary {
+    background-color: #00bfa5;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #00a693;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+}
+
+/* Note Card Enhancements */
+.note-card {
+    position: relative;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.note-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.note-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+}
+
+.note-header h2 {
+    margin: 0;
+    font-size: 18px;
+    color: #333;
+    flex: 1;
+}
+
+.note-actions {
+    display: flex;
+    gap: 5px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.note-card:hover .note-actions {
+    opacity: 1;
+}
+
+.action-btn {
+    background: none;
+    border: none;
+    padding: 5px;
+    cursor: pointer;
+    color: #666;
+    border-radius: 3px;
+    transition: all 0.2s ease;
+}
+
+.action-btn:hover {
+    background-color: #f0f0f0;
+    color: #333;
+}
+
+.action-btn.delete:hover {
+    background-color: #ffebee;
+    color: #f44336;
+}
+
+.note-content {
+    margin-bottom: 15px;
+}
+
+.note-content p {
+    margin: 0;
+    line-height: 1.5;
+    color: #555;
+}
+
+.note-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+}
+
+.color-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+/* Loading Spinner */
+.loading-spinner {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+}
+
+.loading-spinner i {
+    font-size: 2rem;
+    color: #00bfa5;
+}
+
+/* No Notes Message */
+.no-notes {
+    text-align: center;
+    padding: 60px 20px;
+    color: #666;
+    font-size: 18px;
+    grid-column: 1 / -1;
+}
+
+/* Message Animation */
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .notes-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .note-card {
+        width: 100%;
+    }
+    
+    .modal-content {
+        width: 95%;
+        margin: 10% auto;
+    }
+    
+    .header {
+        flex-direction: column;
+        gap: 15px;
+        align-items: stretch;
+    }
+    
+    .header input {
+        margin-left: 0;
+        width: 100%;
+    }
+}
