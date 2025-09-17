@@ -10,15 +10,16 @@ $message = '';
 $messageType = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $usernameOrEmail = trim($_POST['username'] ?? '');
+    $username = trim($_POST['username'] ?? '');
     $password = $_POST['password'] ?? '';
 
-    if (empty($usernameOrEmail) || empty($password)) {
-        $message = "Please enter both username/email and password.";
+    if (empty($username) || empty($password)) {
+        $message = "Please enter both username and password.";
         $messageType = "error";
     } else {
-        $stmt = $pdo->prepare("SELECT id, username, password FROM users WHERE username = ? OR email = ?");
-        $stmt->execute([$usernameOrEmail, $usernameOrEmail]);
+        // ✅ Fixed query: only check username (since no email column exists)
+        $stmt = $pdo->prepare("SELECT id, username, password FROM users WHERE username = ?");
+        $stmt->execute([$username]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($user && password_verify($password, $user['password'])) {
@@ -29,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             header("Location: admin.php");
             exit();
         } else {
-            $message = "Invalid username/email or password.";
+            $message = "Invalid username or password.";
             $messageType = "error";
         }
     }
@@ -57,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <?php endif; ?>
 
     <form method="POST" action="">
-        <label>Username or Email:</label>
+        <label>Username:</label>
         <input type="text" name="username" required>
 
         <label>Password:</label>
