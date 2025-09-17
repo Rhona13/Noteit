@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $id      = $_POST['id'] ?? '';
         $title   = $_POST['title'] ?? '';
         $content = $_POST['content'] ?? '';
-        
+
         if ($id && $title && $content) {
             $stmt = $conn->prepare(
                 "UPDATE notes 
