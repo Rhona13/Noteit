@@ -91,7 +91,7 @@ $notes = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <title>NoteIt_Admin</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <meta name="theme-color" content="#06b399">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="admin.css">
 </head>
 
 <body class="admin-body">
