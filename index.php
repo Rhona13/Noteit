@@ -5,10 +5,10 @@ $user_id = 1; // Default user for now
 
 // --- Handle Actions (CRUD) ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $action = $_POST['action'] ?? null;
-    $id     = $_POST['id'] ?? null;
-    $title  = $_POST['title'] ?? null;
-    $content= $_POST['content'] ?? null;
+    $action  = $_POST['action'] ?? null;
+    $id      = $_POST['id'] ?? null;
+    $title   = $_POST['title'] ?? null;
+    $content = $_POST['content'] ?? null;
 
     switch ($action) {
         case 'add':
@@ -30,10 +30,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             break;
 
-        case 'favorite':
+        case 'favorite': 
+            // Since we don't have "Favorite" in ENUM, we just keep it as 'active'
+            // OR you can remove this case entirely if you don't want favorite functionality
             if ($id) {
                 $stmt = $conn->prepare(
-                    "UPDATE notes SET status = 'Favorite' WHERE id = ? AND user_id = ?"
+                    "UPDATE notes SET status = 'active' WHERE id = ? AND user_id = ?"
                 );
                 $stmt->execute([$id, $user_id]);
             }
@@ -42,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         case 'archive':
             if ($id) {
                 $stmt = $conn->prepare(
-                    "UPDATE notes SET status = 'Archived' WHERE id = ? AND user_id = ?"
+                    "UPDATE notes SET status = 'archived' WHERE id = ? AND user_id = ?"
                 );
                 $stmt->execute([$id, $user_id]);
             }
@@ -51,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         case 'delete':
             if ($id) {
                 $stmt = $conn->prepare(
-                    "DELETE FROM notes WHERE id = ? AND user_id = ?"
+                    "UPDATE notes SET status = 'deleted' WHERE id = ? AND user_id = ?"
                 );
                 $stmt->execute([$id, $user_id]);
             }
@@ -74,7 +76,7 @@ $title_color   = "#222";
 
 switch ($filter) {
     case 'favorite':
-        $section_title = "★ Favorites";
+        $section_title = "★ Active Notes"; // renamed to match ENUM
         $title_color   = "#06b399";
         break;
     case 'archived':
@@ -86,9 +88,9 @@ switch ($filter) {
 // --- Fetch Notes ---
 $sql = "SELECT * FROM notes WHERE user_id = ?";
 if ($filter === 'favorite') {
-    $sql .= " AND status = 'Favorite'";
+    $sql .= " AND status = 'active'";
 } elseif ($filter === 'archived') {
-    $sql .= " AND status = 'Archived'";
+    $sql .= " AND status = 'archived'";
 }
 $sql .= " ORDER BY date_created DESC";
 
