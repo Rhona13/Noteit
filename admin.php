@@ -8,6 +8,40 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $username = $_SESSION['username'];
+$user_id = $_SESSION['user_id'];
+
+// Database connection configuration
+$host = getenv('DB_HOST') ?: 'localhost';
+$dbname = getenv('DB_NAME') ?: 'default';
+$dbuser = getenv('DB_USER') ?: 'mysql';
+$dbpass = getenv('DB_PASS') ?: '';
+$port = getenv('DB_PORT') ?: 3306;
+
+// Create database connection
+try {
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname;port=$port;charset=utf8mb4", $dbuser, $dbpass, [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_EMULATE_PREPARES => false
+    ]);
+} catch (PDOException $e) {
+    die("Connection failed: " . $e->getMessage());
+}
+
+// ✅ Handle adding a new note
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['title'], $_POST['content'])) {
+    $title = trim($_POST['title']);
+    $content = trim($_POST['content']);
+    $color = $_POST['color'] ?? '#FFC107';
+
+    if (!empty($title) && !empty($content)) {
+        $stmt = $pdo->prepare("INSERT INTO notes (user_id, title, content, color) VALUES (?, ?, ?, ?)");
+        $stmt->execute([$user_id, $title, $content, $color]);
+
+        // Refresh to see the new note
+        header("Location: admin.php");
+        exit();
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -26,7 +60,7 @@ $username = $_SESSION['username'];
                 <li class="nav-item active" data-filter="all"><i class="fa-regular fa-clipboard"></i> All Notes</li>
                 <li class="nav-item" data-filter="favorites"><i class="fa-regular fa-heart"></i> Favorites</li>
                 <li class="nav-item" data-filter="archived"><i class="fa-regular fa-file-zipper"></i> Archives</li>
-                <a href="#" id="logoutBtn"><li><i class="fa-solid fa-right-from-bracket"></i> Logout</li></a>
+                <a href="logout.php"><li><i class="fa-solid fa-right-from-bracket"></i> Logout</li></a>
             </ul>
             <div class="user-info">
                 <div class="avatar"></div>
@@ -45,7 +79,24 @@ $username = $_SESSION['username'];
                 <button class="add-note" id="addNoteBtn"><i class="fa-solid fa-plus"></i>Add Notes</button>
             </div>
             <div class="notes-container" id="notesContainer">
-                <!-- Notes will be loaded dynamically -->
+                <?php
+                // ✅ Display notes for logged-in user
+                $stmt = $pdo->prepare("SELECT * FROM notes WHERE user_id = ? ORDER BY created_at DESC");
+                $stmt->execute([$user_id]);
+                $notes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                if ($notes) {
+                    foreach ($notes as $note) {
+                        echo "<div class='note' style='background-color:".htmlspecialchars($note['color'])."'>";
+                        echo "<h3>".htmlspecialchars($note['title'])."</h3>";
+                        echo "<p>".nl2br(htmlspecialchars($note['content']))."</p>";
+                        echo "<small>Created: ".$note['created_at']."</small>";
+                        echo "</div>";
+                    }
+                } else {
+                    echo "<p>No notes yet. Add one!</p>";
+                }
+                ?>
             </div>
         </div>
     </div>
@@ -57,7 +108,8 @@ $username = $_SESSION['username'];
                 <h2 id="modalTitle">Add New Note</h2>
                 <span class="close" id="closeModal">&times;</span>
             </div>
-            <form id="noteForm">
+            <!-- ✅ Form submits to same page -->
+            <form id="noteForm" method="POST">
                 <input type="hidden" id="noteId" name="note_id">
                 <div class="form-group">
                     <label for="noteTitle">Title</label>
