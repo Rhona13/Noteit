@@ -1,4 +1,8 @@
 <?php
+// Show errors while debugging
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 session_start();
 require_once 'config.php';
 
@@ -31,3 +35,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login - NoteIt!</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .message.error { color: red; }
+        .message.success { color: green; }
+        form { max-width: 300px; margin: auto; }
+        input { display: block; width: 100%; padding: 8px; margin: 10px 0; }
+        button { padding: 8px 15px; }
+    </style>
+</head>
+<body>
+    <h2>Login</h2>
+
+    <?php if (!empty($message)) : ?>
+        <p class="message <?= $messageType ?>"><?= htmlspecialchars($message) ?></p>
+    <?php endif; ?>
+
+    <form method="POST" action="">
+        <label>Username or Email:</label>
+        <input type="text" name="username" required>
+
+        <label>Password:</label>
+        <input type="password" name="password" required>
+
+        <button type="submit">Login</button>
+    </form>
+</body>
+</html>
