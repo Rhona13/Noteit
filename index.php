@@ -3,7 +3,7 @@ session_start();
 
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
-    header('Location: admin.php');
+    header('Location: index.php');
     exit();
 }
 
@@ -38,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['title'], $_POST['cont
         $stmt->execute([$user_id, $title, $content, $color]);
 
         // Refresh to see the new note
-        header("Location: admin.php");
+        header("Location: index.php");
         exit();
     }
 }
